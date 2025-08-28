@@ -246,15 +246,15 @@ anomaly_pred <- as.factor(ifelse(anomaly_flags_test == "TRUE", 1, 0))
 levels(anomaly_pred) <- c(0,1)
 
 mds_coords <- cmdscale(matrix_test, k = 2)
-mds_df <- as.data.frame(mds_coords)
-colnames(mds_df) <- c("Dim1", "Dim2")
+tsne_df <- as.data.frame(mds_coords)
+colnames(tsne_df) <- c("Dim1", "Dim2")
 
-mds_df$anomaly_pred <- c(rep(0,n_medoids), ifelse(anomaly_flags_test == "TRUE", 1, 0))
-mds_df$anomaly_pred <- as.factor(mds_df$anomaly_pred)
-mds_df$target <- c(medoids$target, data_sample$target)
-mds_df$target <- as.factor(mds_df$target)
+tsne_df$anomaly_pred <- c(rep(0,n_medoids), ifelse(anomaly_flags_test == "TRUE", 1, 0))
+tsne_df$anomaly_pred <- as.factor(tsne_df$anomaly_pred)
+tsne_df$target <- c(medoids$target, data_sample$target)
+tsne_df$target <- as.factor(tsne_df$target)
 
-ggplot(mds_df, aes(x = Dim1, y = Dim2)) +
+ggplot(tsne_df, aes(x = Dim1, y = Dim2)) +
   geom_point(aes(shape = anomaly_pred, color = target, fill = anomaly_pred), alpha=0.6, stroke = 1.5) +
   scale_color_manual(values = c('0' = "lightblue", '1' = "hotpink")) +
   scale_shape_manual(values = c('0' = 1, '1' = 4)) +
@@ -296,33 +296,33 @@ levels(anomaly_pred) <- c(0,1)
 # dimensionality reduction for visualisation
 library(Rtsne)
 tsne_out <- Rtsne(matrix_test, dims = 2, perplexity = 35, verbose = TRUE, check_duplicates = FALSE)
-mds_df <- as.data.frame(tsne_out$Y)
-colnames(mds_df) <- c("Dim1", "Dim2")
+tsne_df <- as.data.frame(tsne_out$Y)
+colnames(tsne_df) <- c("Dim1", "Dim2")
 
-mds_df$anomaly_pred <- c(rep(0,n_medoids), ifelse(anomaly_flags_test == "TRUE", 1, 0))
-mds_df$anomaly_pred <- as.factor(mds_df$anomaly_pred)
-mds_df$medoid <- c(1,2,rep(0,nrow(mds_df)-2))
-mds_df$medoid <- as.factor(mds_df$medoid)
-mds_df$target <- c(medoids$target, train_data$target, data_sample$target)
-mds_df$target <- as.factor(mds_df$target)
-mds_df$cluster <- c(medoids$cluster_kamila, train_data$cluster_kamila, closest_medoid_idx[rownames(data_sample)])
-mds_df$cluster <- as.factor(mds_df$cluster)
+tsne_df$anomaly_pred <- c(rep(0,n_medoids), ifelse(anomaly_flags_test == "TRUE", 1, 0))
+tsne_df$anomaly_pred <- as.factor(tsne_df$anomaly_pred)
+tsne_df$medoid <- c(1,2,rep(0,nrow(tsne_df)-2))
+tsne_df$medoid <- as.factor(tsne_df$medoid)
+tsne_df$target <- c(medoids$target, train_data$target, data_sample$target)
+tsne_df$target <- as.factor(tsne_df$target)
+tsne_df$cluster <- c(medoids$cluster_kamila, train_data$cluster_kamila, closest_medoid_idx[rownames(data_sample)])
+tsne_df$cluster <- as.factor(tsne_df$cluster)
 
-ggplot(mds_df, aes(x = Dim1, y = Dim2)) +
+ggplot(tsne_df, aes(x = Dim1, y = Dim2)) +
   geom_point(data = ~ filter(.x, medoid == 1), # marking medoids
              shape = 1, size = 5, stroke = 2, color = "darkslateblue", fill = NA) +
   geom_point(data = ~ filter(.x, medoid == 2), # marking medoids
              shape = 1, size = 5, stroke = 2, color = "darkcyan", fill = NA) +
   geom_point(aes(color = cluster), alpha=0.5, stroke = 1.5) +
   scale_color_manual(values = c('1' = "darkslateblue", '2' = "darkcyan")) +
-  geom_text(data = filter(mds_df, medoid == 1),
+  geom_text(data = filter(tsne_df, medoid == 1),
             aes(label = "Medoid 1"), fontface = "bold", vjust = -1.2, color = "darkslateblue") +
-  geom_text(data = filter(mds_df, medoid == 2), aes(label = "Medoid 2"), fontface = "bold",
+  geom_text(data = filter(tsne_df, medoid == 2), aes(label = "Medoid 2"), fontface = "bold",
             vjust = +2.2, color = "darkcyan") +
-  labs(title = "MDS plot showing clustering result", x = "Dimension 1", y = "Dimension 2", color = "Cluster") +
+  labs(title = "t-SNE plot showing clustering result", x = "Dimension 1", y = "Dimension 2", color = "Cluster") +
   theme_minimal()
 
-ggplot(mds_df, aes(x = Dim1, y = Dim2)) +
+ggplot(tsne_df, aes(x = Dim1, y = Dim2)) +
   geom_point(data = ~ filter(.x, medoid == 1), # marking medoids
              shape = 1, size = 5, stroke = 2, color = "darkslateblue", fill = NA) +
   geom_point(data = ~ filter(.x, medoid == 2), # marking medoids
@@ -331,10 +331,10 @@ ggplot(mds_df, aes(x = Dim1, y = Dim2)) +
   scale_color_manual(values = c('0' = "darkcyan", '1' = "lightcoral")) +
   scale_alpha_manual(values = c('0' = 0.4, '1' = 0.8)) +
   scale_shape_manual(values = c('0' = 1, '1' = 4)) +
-  geom_text(data = filter(mds_df, medoid == 1), aes(label = "Medoid 1"), fontface = "bold",family = "Times New Roman", vjust = -1.2, color = "darkslateblue") +
-  geom_text(data = filter(mds_df, medoid == 2), aes(label = "Medoid 2"), fontface = "bold",family = "Times New Roman",
+  geom_text(data = filter(tsne_df, medoid == 1), aes(label = "Medoid 1"), fontface = "bold",family = "Times New Roman", vjust = -1.2, color = "darkslateblue") +
+  geom_text(data = filter(tsne_df, medoid == 2), aes(label = "Medoid 2"), fontface = "bold",family = "Times New Roman",
             vjust = 2.2, color = "darkgreen") +
-  labs(title = "MDS plot showing anomalies and targets", x = "Dimension 1", y = "Dimension 2",
+  labs(title = "t-SNE plot showing anomalies and targets", x = "Dimension 1", y = "Dimension 2",
        shape = "Anomaly flag", color = "Target",alpha = "Target") +
   theme_minimal() +
   theme(plot.title = element_text(family = "Times New Roman", face = "bold", hjust = 0.5),
