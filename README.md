@@ -1,4 +1,4 @@
-# thesisClustAnomalyDetection
+# ClustAnomalyDetection
 ## Clustering-Based Anomaly Detection in Mixed-Type Medical Data
 
 This repository contains code used for data loading, preproessing, and data analysis conducted for my thesis project.
